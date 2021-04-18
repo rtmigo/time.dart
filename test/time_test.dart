@@ -65,7 +65,7 @@ void main() {
       results.add(r);
     }
 
-    expect(results.length, 1); // ровно один результат, потому что интервал 1 миллисекунда
+    expect(results.length, 1, reason: results.toString()); // ровно один результат, потому что интервал 1 миллисекунда
   });
 
   test('randomTimeBetween exotic cases', () {
