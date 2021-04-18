@@ -1,5 +1,10 @@
 import 'dart:math';
 
+// microseconds work on VM, but not JS
+final bool microsecondsSupported = 
+    (DateTime(2020, 02, 20, 20, 20, 20, 20, 20))
+    .isBefore(DateTime(2020, 02, 20, 20, 20, 20, 20, 21));
+
 DateTime? maxDateTime(Iterable<DateTime?> values) {
   DateTime? result;
 
@@ -32,20 +37,23 @@ Duration durationFromSeconds(double sec) =>
 Duration durationFromMillis(double ms) =>
     Duration(microseconds: (ms * Duration.microsecondsPerMillisecond).round());
 
-DateTime randomTimeBetween(DateTime a, DateTime b) {
-  if (b.isBefore(a) || a.isAtSameMomentAs(b)) {
+/// Generates random [DateTime] within the specified interval.
+DateTime randomTimeBetween(DateTime minInc, DateTime maxExc, {Random? random}) {
+  if (maxExc.isBefore(minInc) || maxExc.isAtSameMomentAs(minInc)) {
     throw ArgumentError();
   }
 
-  int ia = a.microsecondsSinceEpoch;
-  int ib = b.microsecondsSinceEpoch;
+  int ia = microsecondsSupported ? minInc.microsecondsSinceEpoch : minInc.millisecondsSinceEpoch;
+  int ib = microsecondsSupported ? maxExc.microsecondsSinceEpoch : maxExc.millisecondsSinceEpoch;
 
-  int ic = ia + Random().nextInt(ib - ia);
+  random??=Random();
 
-  final result = DateTime.fromMicrosecondsSinceEpoch(ic);
+  int ic = ia + random.nextInt(ib - ia);
 
-  assert(result.isAfter(a) || result.isAtSameMomentAs(a));
-  assert(result.isBefore(b));
+  final result = microsecondsSupported ? DateTime.fromMicrosecondsSinceEpoch(ic) : DateTime.fromMillisecondsSinceEpoch(ic);
+
+  assert(result.isAfter(minInc) || result.isAtSameMomentAs(minInc));
+  assert(result.isBefore(maxExc));
 
   return result;
 }

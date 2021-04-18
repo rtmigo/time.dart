@@ -4,6 +4,8 @@ import 'package:rztime/rztime.dart';
 import 'package:test/test.dart';
 
 void main() {
+
+
   test('findMax', () {
     expect(
         maxDateTime([
@@ -22,8 +24,12 @@ void main() {
   });
 
   test('roundToSecond', () {
-    expect(DateTime(2021, 1, 1, 22, 36, 15, 499, 999).roundToSeconds(),
-        DateTime(2021, 1, 1, 22, 36, 15));
+
+    if (microsecondsSupported) {
+      expect(DateTime(
+          2021, 1, 1, 22, 36, 15, 499, 999).roundToSeconds(),
+          DateTime(2021, 1, 1, 22, 36, 15));
+    }
     expect(DateTime(2021, 1, 1, 22, 36, 15, 500, 000).roundToSeconds(),
         DateTime(2021, 1, 1, 22, 36, 16));
     expect(DateTime(2021, 1, 1, 22, 36, 15, 500, 000).floorToSecond(),
@@ -31,16 +37,18 @@ void main() {
   });
 
   test('sinceDayStart', () {
-    expect(DateTime(2021, 1, 1, 22, 36, 15, 499, 999).durationSinceDayStart(),
-        Duration(hours: 22, minutes: 36, seconds: 15, microseconds: 499999));
+    if (microsecondsSupported) {
+      expect(DateTime(2021, 1, 1, 22, 36, 15, 499, 999).durationSinceDayStart(),
+             Duration(hours: 22, minutes: 36, seconds: 15, microseconds: 499999));
+    }
     expect(DateTime(2021, 1, 1, 0, 5, 15, 499, 999).durationSinceDayStart().inSeconds, 315);
   });
 
-  test('randomTimeBetween within millisecond', () {
+  test('randomTimeBetween within second', () {
     final a = DateTime.now();
-    final b = DateTime.now().add(Duration(milliseconds: 1));
+    final b = a.add(Duration(seconds: 1));
 
-    Set<DateTime> results = Set<DateTime>();
+    Set<DateTime> results = <DateTime>{};
 
     for (int i = 0; i <= 1000; ++i) {
       final r = randomTimeBetween(a, b);
@@ -52,9 +60,9 @@ void main() {
     expect(results.length, greaterThan(10));
   });
 
-  test('randomTimeBetween one microsecond', () {
+  test('randomTimeBetween within millisecond', () {
     final a = DateTime.now();
-    final b = DateTime.now().add(Duration(microseconds: 1));
+    final b = a.add(Duration(milliseconds: 1));
 
     Set<DateTime> results = <DateTime>{};
 
@@ -65,12 +73,51 @@ void main() {
       results.add(r);
     }
 
-    expect(results.length, 1); // ровно один результат, потому что интервал 1 миллисекунда
+    if (microsecondsSupported) {
+      expect(results.length, greaterThan(10));
+    } else
+      {
+        expect(results.length, 1); // in JS: just one millisecond
+      }
   });
+
+  if (microsecondsSupported) {
+    test('randomTimeBetween must be inclusive', () {
+      final a = DateTime.now();
+      final b = a.add(Duration(microseconds: 10));
+
+      Set<DateTime> results = <DateTime>{};
+
+      for (int i = 0; i <= 1000; ++i) {
+        results.add(randomTimeBetween(a, b));
+      }
+
+      expect(results.contains(a), isTrue);
+      expect(results.contains(b), isFalse);
+    });
+  }
+
+  if (microsecondsSupported) {
+    test('randomTimeBetween one microsecond', () {
+      final a = DateTime.now();
+      final b = a.add(Duration(microseconds: 1));
+
+      Set<DateTime> results = <DateTime>{};
+
+      for (int i = 0; i <= 1000; ++i) {
+        final r = randomTimeBetween(a, b);
+        expect(r.isAfter(a) || r.isAtSameMomentAs(a), isTrue);
+        expect(r.isBefore(b), isTrue);
+        results.add(r);
+      }
+
+      expect(results.length, 1, reason: results.toString());
+    });
+  }
 
   test('randomTimeBetween exotic cases', () {
     final a = DateTime.now();
-    final b = DateTime.now().add(Duration(seconds: 1));
+    final b = a.add(Duration(seconds: 1));
 
     expect(() => randomTimeBetween(a, a), throwsArgumentError);
     expect(() => randomTimeBetween(b, b), throwsArgumentError);
