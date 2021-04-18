@@ -1,5 +1,10 @@
 import 'dart:math';
 
+// microseconds work on VM, but not JS
+final bool microsecondsSupported = 
+    (DateTime(2020, 02, 20, 20, 20, 20, 20, 20))
+    .isBefore(DateTime(2020, 02, 20, 20, 20, 20, 20, 21));
+
 DateTime? maxDateTime(Iterable<DateTime?> values) {
   DateTime? result;
 
@@ -38,14 +43,14 @@ DateTime randomTimeBetween(DateTime minInc, DateTime maxExc, {Random? random}) {
     throw ArgumentError();
   }
 
-  int ia = minInc.microsecondsSinceEpoch;
-  int ib = maxExc.microsecondsSinceEpoch;
+  int ia = microsecondsSupported ? minInc.microsecondsSinceEpoch : minInc.millisecondsSinceEpoch;
+  int ib = microsecondsSupported ? maxExc.microsecondsSinceEpoch : maxExc.millisecondsSinceEpoch;
 
   random??=Random();
 
   int ic = ia + random.nextInt(ib - ia);
 
-  final result = DateTime.fromMicrosecondsSinceEpoch(ic);
+  final result = microsecondsSupported ? DateTime.fromMicrosecondsSinceEpoch(ic) : DateTime.fromMillisecondsSinceEpoch(ic);
 
   assert(result.isAfter(minInc) || result.isAtSameMomentAs(minInc));
   assert(result.isBefore(maxExc));
