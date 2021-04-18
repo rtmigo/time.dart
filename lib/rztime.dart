@@ -31,13 +31,20 @@ Future<void> pauseMs(num milliseconds) async {
       Duration(microseconds: (milliseconds * Duration.microsecondsPerMillisecond).round()));
 }
 
+
+@deprecated
+Duration durationFromMillis(double ms) => durationFromMilliseconds(ms);
+
+// todo unit test in JS
 Duration durationFromSeconds(double sec) =>
     Duration(microseconds: (sec * Duration.microsecondsPerSecond).round());
 
-Duration durationFromMillis(double ms) =>
+// todo unit test in JS
+Duration durationFromMilliseconds(double ms) =>
     Duration(microseconds: (ms * Duration.microsecondsPerMillisecond).round());
 
-/// Generates random [DateTime] within the specified interval.
+
+/// Generates random [DateTime] uniformly distributed in the specified range.
 DateTime randomTimeBetween(DateTime minInc, DateTime maxExc, {Random? random}) {
   if (maxExc.isBefore(minInc) || maxExc.isAtSameMomentAs(minInc)) {
     throw ArgumentError();
@@ -68,7 +75,7 @@ extension DateTimeExt on DateTime {
     return DateTime(this.year, this.month, this.day, this.hour, this.minute);
   }
 
-  DateTime roundToSeconds() {
+  DateTime roundToSecond() {
     var result = this.floorToSecond();
 
     final mcs = this.millisecond * Duration.microsecondsPerMillisecond + this.microsecond;
@@ -78,6 +85,9 @@ extension DateTimeExt on DateTime {
     }
     return result;
   }
+
+  @deprecated // since 2021-04
+  DateTime roundToSeconds() => roundToSeconds();
 
   DateTime floorToDay() {
     return DateTime(this.year, this.month, this.day);

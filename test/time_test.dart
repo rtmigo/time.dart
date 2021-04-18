@@ -27,10 +27,10 @@ void main() {
 
     if (microsecondsSupported) {
       expect(DateTime(
-          2021, 1, 1, 22, 36, 15, 499, 999).roundToSeconds(),
+          2021, 1, 1, 22, 36, 15, 499, 999).roundToSecond(),
           DateTime(2021, 1, 1, 22, 36, 15));
     }
-    expect(DateTime(2021, 1, 1, 22, 36, 15, 500, 000).roundToSeconds(),
+    expect(DateTime(2021, 1, 1, 22, 36, 15, 500, 000).roundToSecond(),
         DateTime(2021, 1, 1, 22, 36, 16));
     expect(DateTime(2021, 1, 1, 22, 36, 15, 500, 000).floorToSecond(),
         DateTime(2021, 1, 1, 22, 36, 15));
