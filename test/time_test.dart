@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:rztime/rztime.dart';
+import 'package:rcd_time/rcd_time.dart';
 import 'package:test/test.dart';
 
 void main() {
