@@ -52,9 +52,23 @@ void main() {
     expect(results.length, greaterThan(10));
   });
 
+  test('randomTimeBetween must be inclusive', () {
+    final a = DateTime.now();
+    final b = a.add(Duration(microseconds: 10));
+
+    Set<DateTime> results = <DateTime>{};
+
+    for (int i = 0; i <= 1000; ++i) {
+      results.add(randomTimeBetween(a, b));
+    }
+
+    expect(results.contains(a), isTrue);
+    expect(results.contains(b), isFalse);
+  });
+
   test('randomTimeBetween one microsecond', () {
     final a = DateTime.now();
-    final b = DateTime.now().add(Duration(microseconds: 1));
+    final b = a.add(Duration(microseconds: 1));
 
     Set<DateTime> results = <DateTime>{};
 
@@ -65,12 +79,12 @@ void main() {
       results.add(r);
     }
 
-    expect(results.length, 1, reason: results.toString()); // ровно один результат, потому что интервал 1 миллисекунда
+    expect(results.length, 1, reason: results.toString());
   });
 
   test('randomTimeBetween exotic cases', () {
     final a = DateTime.now();
-    final b = DateTime.now().add(Duration(seconds: 1));
+    final b = a.add(Duration(seconds: 1));
 
     expect(() => randomTimeBetween(a, a), throwsArgumentError);
     expect(() => randomTimeBetween(b, b), throwsArgumentError);

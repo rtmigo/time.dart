@@ -32,20 +32,23 @@ Duration durationFromSeconds(double sec) =>
 Duration durationFromMillis(double ms) =>
     Duration(microseconds: (ms * Duration.microsecondsPerMillisecond).round());
 
-DateTime randomTimeBetween(DateTime a, DateTime b) {
-  if (b.isBefore(a) || a.isAtSameMomentAs(b)) {
+/// Generates random [DateTime] within the specified interval.
+DateTime randomTimeBetween(DateTime minInc, DateTime maxExc, {Random? random}) {
+  if (maxExc.isBefore(minInc) || maxExc.isAtSameMomentAs(minInc)) {
     throw ArgumentError();
   }
 
-  int ia = a.microsecondsSinceEpoch;
-  int ib = b.microsecondsSinceEpoch;
+  int ia = minInc.microsecondsSinceEpoch;
+  int ib = maxExc.microsecondsSinceEpoch;
 
-  int ic = ia + Random().nextInt(ib - ia);
+  random??=Random();
+
+  int ic = ia + random.nextInt(ib - ia);
 
   final result = DateTime.fromMicrosecondsSinceEpoch(ic);
 
-  assert(result.isAfter(a) || result.isAtSameMomentAs(a));
-  assert(result.isBefore(b));
+  assert(result.isAfter(minInc) || result.isAtSameMomentAs(minInc));
+  assert(result.isBefore(maxExc));
 
   return result;
 }
