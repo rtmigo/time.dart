@@ -87,7 +87,7 @@ extension DateTimeExt on DateTime {
   }
 
   @deprecated // since 2021-04
-  DateTime roundToSeconds() => roundToSeconds();
+  DateTime roundToSeconds() => roundToSecond();
 
   DateTime floorToDay() {
     return DateTime(this.year, this.month, this.day);
